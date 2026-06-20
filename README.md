@@ -1,28 +1,27 @@
 # Content Moderation Platform
 
-AI-powered image moderation platform built with Next.js, MongoDB, and Claude AI.
+A full-stack image moderation platform where uploaded images are scanned by Claude AI against six violation categories. Users get instant verdicts, can appeal decisions they disagree with, and admins have full control over policies and review queues.
 
-## Setup
-
-### Local Development
+## Local Development
 
 1. Clone the repo
-2. Copy `.env.local.example` to `.env.local` and fill in values
-3. Run:
+2. Copy `.env.local.example` to `.env.local` and fill in your values
+3. Install and run:
 
+```bash
 npm install
 npm run dev
+```
 
+## Docker
 
-### Docker (Production)
+Create a `.env` file with `NEXTAUTH_SECRET` and `ANTHROPIC_API_KEY`, then:
 
-1. Create `.env` file with `NEXTAUTH_SECRET` and `ANTHROPIC_API_KEY`
-2. Run:
-
+```bash
 docker-compose up --build
+```
 
-
-App runs at `http://localhost:3000`
+App will be running at `http://localhost:3000`
 
 ## Environment Variables
 
@@ -35,23 +34,16 @@ App runs at `http://localhost:3000`
 
 ## Creating an Admin User
 
-Register normally, then in MongoDB shell run:
+Register through the app normally, then run this in your MongoDB shell:
 
+```js
 db.users.updateOne({ email: "your@email.com" }, { $set: { role: "admin" } })
-
+```
 
 ## Architecture
 
-- **Next.js App Router** — frontend + API routes in one codebase
-- **NextAuth v5** — JWT-based auth with role support (user/admin)
-- **MongoDB + Mongoose** — data storage with structured schemas
-- **Claude AI (claude-sonnet-4-6)** — vision model for image analysis
-- **Route Groups** — `(auth)`, `(user)`, `(admin)` for clean separation
-- **Middleware** — protects routes based on session and role
+Built with Next.js App Router so the frontend and API live in one codebase with no separate Express server needed. NextAuth v5 handles authentication with JWT-based sessions and role support. MongoDB with Mongoose stores all data. Route groups `(auth)`, `(user)`, and `(admin)` keep the folder structure clean, and a middleware file handles route protection based on session and role.
 
-## Key Design Decisions
+## Design Decisions
 
-- Images stored as base64 in MongoDB (no S3 needed for assessment scope)
-- Policy is a single document; all categories live inside it
-- AI prompt returns structured JSON directly — no post-processing needed
-- Policy snapshot saved with each verdict so historical records stay accurate
+Images are stored as base64 directly in MongoDB, which keeps the setup simple without needing S3 or any external storage. Moderation policies live as a single document with all six categories inside it. The AI prompt is designed to return structured JSON directly so no parsing layer is needed. Each verdict also saves a snapshot of the policy that was active at the time, so historical records stay accurate even if settings change later.
