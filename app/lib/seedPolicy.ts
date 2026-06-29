@@ -1,5 +1,5 @@
 import { connectDB } from "./db";
-import Policy from "@/models/Policy";
+import Policy from "../models/Policy";
 
 export async function seedDefaultPolicy() {
   await connectDB();

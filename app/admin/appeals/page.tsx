@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/app/components/Navbar";
 
 export default function AdminAppealsPage() {
   const [appeals, setAppeals] = useState<any[]>([]);

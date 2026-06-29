@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
-import Appeal from "@/models/Appeal";
-import Submission from "@/models/Submission";
+import { auth } from "@/app/lib/auth";
+import { connectDB } from "@/app/lib/db";
+import Appeal from "@/app/models/Appeal";
+import Submission from "@/app/models/Submission";
 
 export async function POST(req: NextRequest) {
   const session = await auth();

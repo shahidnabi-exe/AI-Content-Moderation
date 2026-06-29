@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { ICategoryPolicy } from "@/models/Policy";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ICategoryPolicy } from "../models/Policy";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export interface CategoryResult {
   category: string;
@@ -16,6 +16,7 @@ export async function moderateImage(
   mediaType: string,
   activeCategories: ICategoryPolicy[]
 ): Promise<CategoryResult[]> {
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });  
   const categoryList = activeCategories
     .map((c) => `- ${c.name} (${c.label}): threshold ${c.confidenceThreshold}%`)
     .join("\n");
@@ -24,7 +25,7 @@ export async function moderateImage(
 
 ${categoryList}
 
-For each category, respond ONLY with a JSON array (no markdown, no explanation) in this exact format:
+Respond ONLY with a JSON array, no markdown, no explanation, no backticks. Use this exact format:
 [
   {
     "category": "category_name",
@@ -37,28 +38,15 @@ For each category, respond ONLY with a JSON array (no markdown, no explanation) 
 
 Be accurate and conservative. Only flag content that clearly violates the category.`;
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: mediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
-              data: base64Image,
-            },
-          },
-          { type: "text", text: prompt },
-        ],
-      },
-    ],
-  });
+  const imagePart = {
+    inlineData: {
+      data: base64Image,
+      mimeType: mediaType,
+    },
+  };
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "[]";
+  const result = await model.generateContent([prompt, imagePart]);
+  const text = result.response.text();
   const clean = text.replace(/```json|```/g, "").trim();
   return JSON.parse(clean);
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { connectDB } from "@/app/lib/db";
+import User from "@/app/models/User";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Registered successfully", userId: user._id }, { status: 201 });
   } catch (err) {
+    console.error("REGISTER ERROR:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

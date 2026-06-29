@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/app/components/Navbar";
 
 const COLORS = ["#22c55e", "#eab308", "#ef4444"];
 
